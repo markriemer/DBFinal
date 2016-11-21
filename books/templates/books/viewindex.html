@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block javascript %}
+
+
+
+<script type="text/javascript">
+
+  var sortTable = function(orderby){
+     $.get("/books/view/orderby/"+orderby+"?search="+$('#searchtext').val() , function(message) {
+          $('#booklist').html(message);
+     }).fail();
+  }
+
+  var checkout = function(book_id){
+     $.get("/books/checkout/" + book_id , function(message) {
+        if(message=="checkedout")
+          $('#checkout'+book_id).html("Return");
+        else if (message=="returned")
+          $('#checkout'+book_id).html("Check Out");
+        else if (message=="toomany")
+          $('#message').html("You reached your book limit.  Please return a book before checking another out.");
+     }).fail();
+  }
+
+  var executeSearch = function(){
+     $.get("/books/view/orderby/title?search="+$('#searchtext').val(), function(message) {
+          $('#booklist').html(message);
+     }).fail();      
+  }
+
+
+  $(document).ready(function(){
+     $('#booklist').html("loading");
+     $.get("/books/view/orderby/title", function(message) {
+          $('#booklist').html(message);
+     }).fail();
+     $.get("/books/notifications/1", function(message) {
+          $('#notifications').html(message);
+     }).fail();
+  });
+
+</script>
+{% endblock %}
+
+{% block content %}
+Welcome back, {{user.username}} 
+<div>
+   <a href="/books/index/">Admin View</a>
+   <a href="/">Login</a>
+   <a href="/change_password/">Change Password</a>
+</div>
+
+
+<input type="text" id="searchtext" onchange="executeSearch()"/> <button type="button" id="btnSearch" onclick="executeSearch()">Search</button>
+<div id="booklist"></div>
+<div id="message"></div>
+<div id="notifications"></div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+  <div class="jumbotron">
+  <div class="row">
+    {% if messages %}
+    <table>
+      {% for message in messages %}
+      <div class="row">
+      <tr><td>{{ message.username }}</td></tr>
+      <tr><td><textarea readonly>{{ message.message }}</textarea></td></tr>
+      </div>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p> No discussion data is available </p>
+    {% endif%}
+  </div>
+  </div>
+</div>
+{% endblock %}

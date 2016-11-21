@@ -1,0 +1,47 @@
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+
+from .forms import ChangePasswordForm
+from .models import Book
+# Create your views here.
+
+@login_required(login_url="login/")
+def main(request):
+    book_data = Book.objects.all()
+    books = {'book_data': book_data}
+    return render(request,"main.html", books)
+
+@login_required(login_url="login/")
+def change_password(request):
+    if request.method == 'POST':
+        print("POST to change password")
+        form = ChangePasswordForm(request.POST)
+        
+        if form.is_valid():
+            pass1 = form.cleaned_data['password_1']
+            pass2 = form.cleaned_data['password_2']
+            if pass1 == pass2:
+                #update logic
+                print(request.user.username)
+                user = request.user
+                user.set_password(pass1)
+                user.save()
+                render(request, 'main.html')
+            else:
+                print("Invalid password")
+        else:
+            form = ChangePasswordForm()
+            print("Invalid password form?")
+            return(request, 'change_password.html', {'form' : form})
+    else:
+        form = ChangePasswordForm()
+            
+    return render(request, 'change_password.html', {'form': form})
+
+@login_required(login_url="login/")
+def discussion(request, book_id):
+    book_dis = Books.objects.get(pk=book_id)
+    book_context = {"messages" : book_dis.discussion_set.all()}
+    return render(request, 'discussion.html', book_context)
+

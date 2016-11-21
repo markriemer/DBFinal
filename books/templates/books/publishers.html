@@ -1,0 +1,31 @@
+
+{% if pub_list %}
+<form method="post">
+{% csrf_token %}
+
+    <table id="pubtable" border="1" style="border-collapse:collapse">
+        <tr>
+          <td><a href="javascript:void(0)" onclick="sortTable('{{idsort}}')">ID</a></td>
+          <td><a href="javascript:void(0)" onclick="sortTable('{{namesort}}')">Publisher Name</a></td>
+          <td></td>
+        </tr>
+        {% for pub in pub_list %}
+           <tr id="row{{pub.id}}">
+             <td>{{ pub.id }}</td>
+             <td><input type="text" id="name{{pub.id}}" value="{{ pub.name }}" onchange="updatePublisher({{pub.pub_id}})" /></td>
+             <td><button type="button" id="btnDelete" name="btnDelete"  onclick="deletePublisher({{pub.id}})">Delete</button></td>
+           </tr>
+        {% endfor %}
+           <tr id="newrow">
+             <td>Add:</td>
+             <td><input type="text" id="newname" /></td>
+             <td><button type="button" id="btnAdd" name="btnAdd"  onclick="addPublisher()">Add</button></td>
+           </tr>
+    </table>
+</form>
+{% else %}
+    <p>No publishers are available.</p>
+{% endif %}
+
+
+

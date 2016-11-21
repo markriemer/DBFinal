@@ -1,0 +1,28 @@
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script type="text/javascript">
+</script>
+
+<div class="container">
+  <div class="jumbotron">
+  <div class="row">
+    {% if discussion %}
+    <table>
+      {% for message in discussion %}
+      <div class="row">
+      <tr><td>At {{message.post_time}} {{ message.user.username }} wrote:</td></tr>
+      <tr><td><textarea readonly>{{ message.post_text }}</textarea></td></tr>
+      </div>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p> Be the first to discuss the book! </p>
+    {% endif%}
+  </div>
+  </div>
+</div>
+~              

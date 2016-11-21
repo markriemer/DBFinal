@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block javascript %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script type="text/javascript">
+
+ var unlink = function(id){
+     $.get("/books/book/unlink/"+id, "", function(message){
+       $('#wrote'+id).remove();
+     });
+ }
+
+ var link = function(id,authname){
+     $.get("/books/book/link?auth=" + id + "&book="+$('#book_id').html(), "", function(message){
+
+       $('#authorsdiv').append("<span id=\"wrote" + message + "\">" + authname + " <a href=\"javascript:void(0)\" onclick=\"unlink("+message+")\">remove</a><br></span>");
+     });
+ }
+
+ var updateBook = function(){
+     $.get("/books/book/modify/" + $('#book_id').html() +"?title="+$('#title').val()+"&pub="+$('#publisher').val(), "", function(message) {
+          $('#book_id').html(message);
+     });
+ }
+ var addAuthor = function(){
+   var auth = $('#SearchText').val().split('-');
+   link(auth[0],auth[1]);
+ }
+
+var updateAutoComplete = function(){
+	suggestions = [
+                {% for auth in author_list %}
+                      {label:"{{auth.name}}", value:"{{auth.id}}-{{auth.name}}" }, 
+                   {% endfor %}
+		];
+
+
+
+
+	$("#SearchText").autocomplete({
+		source:suggestions 
+	});
+};
+
+
+	
+
+  
+
+$(document).ready(function(){
+
+	$('#SearchText').keyup(updateAutoComplete);
+
+});
+
+
+
+</script>
+
+
+{% endblock %}
+
+{% block content %}
+
+<table border="1" style="border-collapse:collapse">
+    <tr>
+       <th></th>
+       <th></th>
+    </tr>
+       <tr>
+            <td>Book ID</td>
+            <td><span id="book_id">{{book.book_id}}</td>
+       </tr>
+       <tr>
+            <td>Title</td>
+            <td><input type="text" id="title" value="{{book.title}}" onchange="updateBook()" /></td>
+       </tr>
+       <tr>
+            <td>Publisher</td>
+            <td>
+               <select id="publisher" onchange="updateBook()">
+                 {% for pub in publisher_list %}
+                    <option value="{{pub.id}}" 
+                    {% if pub.id == book.pub.id %}
+                       selected>
+                    {% else %}
+                       >
+                    {% endif %}
+                      {{pub.name}}</option> 
+                 {% endfor %}
+            </select>
+            </td>
+       </tr>
+       <tr>
+            <td>Author(s)</td>
+            <td >
+               <div id="authorsdiv">
+                 {% for wrote in wrote_list %}
+                   <span id="wrote{{wrote.id}}">{{wrote.author.name}} <a href="javascript:void(0)" onclick="unlink({{wrote.id}})">remove</a><br></span>
+                 {% endfor %}
+               </div>
+            </td>
+       </tr>
+</table>
+<br>
+Add Author:
+<div class="xxui-widget">
+  <input type="text" id="SearchText" class="SearchText"/>
+  <button type="button" onclick="addAuthor()">Add</button>
+</div>
+
+<a href="/books/auth/">Create new author</a>
+
+{% endblock %}

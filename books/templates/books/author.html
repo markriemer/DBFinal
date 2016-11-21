@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block javascript %}
+
+<script type="text/javascript">
+
+  var toggle = function(){
+     $.get("/books/follow/{{auth.id}}", "", function(message) {
+        if(message=="unfollowed")
+          $('#followbutton').html("Follow");
+        else if (message=="followed")
+          $('#followbutton').html("Unfollow");
+     }).fail();
+
+  }
+
+
+  var checkout = function(book_id){
+     $.get("/books/checkout/" + book_id , function(message) {
+        if(message=="checkedout")
+          $('#checkout'+book_id).html("Return");
+        else if (message=="returned")
+          $('#checkout'+book_id).html("Check Out");
+        else if (message=="toomany")
+          $('#message').html("You reached your book limit.  Please return a book before checking another out.");
+     }).fail();
+  }
+
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+<H1> {{ auth.name }} 
+<button type="button" id="followbutton" onclick="toggle()">
+     {% if followed %}
+       Unfollow
+     {% else %}
+       Follow
+     {% endif %}
+</button></H1>
+
+<table border="1" style="border-collapse:collapse">
+  <th>Title</th>
+  <th>Publisher</th>
+  <th></th>
+  {% for entry in checkouts %}
+    <tr class="row{{entry.book.book_id}}">
+        <td><a href="/books/book/view/{{entry.book.book_id}}">{{ entry.book.title }}</a></td>
+        <td>{{ entry.book.pub.name }}</td>
+        <td><button id="checkout{{entry.book.book_id}}" type="button" onclick="checkout({{ entry.book.book_id }})">Return</button></td>
+    </tr>
+  {% endfor %}
+  {% for entry in wrote_list %}
+    <tr class="row{{entry.book.book_id}}">
+        <td><a href="/books/book/view/{{entry.book.book_id}}">{{ entry.book.title }}</a></td>
+        <td>{{ entry.book.pub.name }}</td>
+        <td><button id="checkout{{entry.book.book_id}}" type="button" onclick="checkout({{ entry.book.book_id }})">Check Out</button></td>
+    </tr>
+  {% endfor %}
+</table>
+<div id="message"></div>
+{% endblock %}

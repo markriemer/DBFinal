@@ -1,0 +1,42 @@
+
+
+<table border="1" style="border-collapse:collapse">
+    <tr>
+       <th><a href="javascript:void(0)" onclick="sortTable('{{titlesort}}')">Book</a></th>
+       <th><a href="javascript:void(0)" onclick="sortTable('{{pubsort}}')">Publisher</a></th>
+       <th>Author</th>
+       <th></th>
+    </tr>
+    <tr><td colspan="4">Checked Out Books</td></tr>
+    {% for entry in checkouts %}
+       <tr class="row{{entry.book.book_id}}">
+         {% if entry.id == -1 %}
+            <td style="border-top-style:none; border-bottom-style:none"></td>
+            <td style="border-top-style:none; border-bottom-style:none"></td>
+            <td><a href="/books/author/view/{{entry.author.id}}"> {{ entry.author.name }}</a></td>
+            <td style="border-top-style:none; border-bottom-style:none"></td>
+         {% else %}
+           <td style="border-top-style:solid; border-bottom-style:none"><a href="/books/book/view/{{entry.book.book_id}}">{{ entry.book.title }}</a></td>
+           <td style="border-top-style:solid; border-bottom-style:none">{{ entry.book.pub.name }}</td>
+           <td><a href="/books/author/view/{{entry.author.id}}"> {{ entry.author.name }}</a></td>
+           <td><button id="checkout{{entry.book.book_id}}" type="button" onclick="checkout({{entry.book.book_id}})">Return</button></td>     
+         {% endif %}
+       </tr>
+    {% endfor %}
+    <tr><td colspan="4">Books Avaliable</td></tr>
+    {% for entry in wrote_list %}
+       <tr class="row{{entry.book.book_id}}">
+         {% if entry.id == -1 %}
+            <td style="border-top-style:none; border-bottom-style:none"></td>
+            <td style="border-top-style:none; border-bottom-style:none"></td>
+            <td><a href="/books/author/view/{{entry.author.id}}"> {{ entry.author.name }}</a></td>
+            <td style="border-top-style:none; border-bottom-style:none"></td>
+         {% else %}
+           <td style="border-top-style:solid; border-bottom-style:none"><a href="/books/book/view/{{entry.book.book_id}}">{{ entry.book.title }}</a></td>
+           <td style="border-top-style:solid; border-bottom-style:none">{{ entry.book.pub.name }}</td>
+           <td><a href="/books/author/view/{{entry.author.id}}"> {{ entry.author.name }}</a></td>
+           <td><button id="checkout{{entry.book.book_id}}" type="button" onclick="checkout({{entry.book.book_id}})">Check Out</button></td>     
+         {% endif %}
+       </tr>
+    {% endfor %}
+</table>

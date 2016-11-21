@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+  <div class="jumbotron">
+  <div class="row">
+    {% if book_data %}
+    <ul>
+      {% for book in book_data %}
+      <li><a href="/books/{{ book.id }}">{{ book.book_title }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p> No book data is available </p>
+    {% endif%}
+  </div>
+  </div>
+</div>
+{% endblock %}

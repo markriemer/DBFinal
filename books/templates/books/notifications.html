@@ -1,0 +1,29 @@
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script type="text/javascript">
+</script>
+
+<div class="container">
+  <div class="jumbotron">
+  <div class="row">
+    {% if notifications %}
+    <h2>Notifications</h2>
+    <table>
+      {% for message in notifications %}
+        <div class="row">
+        <tr><td>{{message.date}}:</td></tr>
+        <tr><td>{{ message.body }}</td></tr>
+      </div>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p> You have no notifications </p>
+    {% endif%}
+  </div>
+  </div>
+</div>
+~              

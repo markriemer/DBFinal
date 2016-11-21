@@ -1,0 +1,63 @@
+
+{% extends 'base.html' %}
+
+{% block javascript %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script type="text/javascript">
+
+var postmessage = function(){
+ $.get("/books/message/post/?book={{book.book_id}}&text=" + $('#newpost').val(), function (message){
+     $.get("/forum/{{book.book_id}}", function(message) {
+          $('#forum').html(message);
+          $('#newpost').val();
+     }).fail();
+ });
+}
+
+$(document).ready(function(){
+     $('#forum').html("loading");
+     $.get("/forum/{{book.book_id}}", function(message) {
+          $('#forum').html(message);
+     }).fail();
+});
+
+</script>
+{% endblock %}
+
+{% block content %}
+
+<table border="1" style="border-collapse:collapse">
+       <tr>
+            <td>Book ID</td>
+            <td><span id="book_id">{{book.book_id}}</td>
+       </tr>
+       <tr>
+            <td>Title</td>
+            <td>{{book.title}}</td>
+       </tr>
+       <tr>
+            <td>Publisher</td>
+            <td>
+               {{book.pub.name}}
+            </td>
+       </tr>
+       <tr>
+            <td>Author(s)</td>
+            <td >
+               <div id="authorsdiv">
+                 {% for wrote in wrote_list %}
+                    {{wrote.author.name}} <br> 
+                 {% endfor %}
+               </div>
+            </td>
+       </tr>
+</table>
+<br>
+<div id="forum"></div>
+<textarea id="newpost"></textarea> <button type="button" onclick="postmessage()">Post</button>
+
+{% endblock %}
