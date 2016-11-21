@@ -146,7 +146,7 @@ CREATE TABLE `auth_user` (
 
 LOCK TABLES `auth_user` WRITE;
 /*!40000 ALTER TABLE `auth_user` DISABLE KEYS */;
-INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$30000$IJBt3OsBsDiS$dFaDhiEuaJ04z0TEyJgaVKwGJVl8UJvoH5Id3JUzrbs=','2016-11-18 01:14:27.950811',1,'mark','','','mar64@zips.uakron.edu',1,1,'2016-11-18 01:14:01.972060'),(2,'pbkdf2_sha256$30000$FBhvLjcc1iEv$gRptQWSK8QkEwSGGvJ3+YZ5mFfk2wdJLhp/Qk0Ng5SA=',NULL,0,'test','Test','User','mar64@zips.uakron.edu',0,1,'2016-11-18 01:18:49.000000');
+INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$30000$IJBt31sBsDiS$dFaDhiEuaJ04z0TEyJgaVKwGJVl8UJvoH5Id3JUzrbs=','2016-11-18 01:14:27.950811',1,'mark','','','mar64@zips.uakron.edu',1,1,'2016-11-18 01:14:01.972060'),(2,'pbkdf2_sha256$30000$FBhvLjcc1iEv$gRptQWSK8QkEwSGGvJ3+YZ5mFfk2wdJLhp/Qk0Ng5SA=',NULL,0,'test','Test','User','mar64@zips.uakron.edu',0,1,'2016-11-18 01:18:49.000000');
 /*!40000 ALTER TABLE `auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
