@@ -9,6 +9,7 @@
     </tr>
     {% for entry in wrote_list %}
        <tr class="row{{entry.book.book_id}}">
+         <!-- a '-1' in the id means that it's a duplicate so we don't repeat book and publisher data   -->
          {% if entry.id == -1 %}
             <td style="border-top-style:none; border-bottom-style:none"></td>
             <td style="border-top-style:none; border-bottom-style:none"></td>

@@ -5,6 +5,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script type="text/javascript">
 
+  //sends ajax request that deletes the book
   var deleteBook = function(id){
      $.get("/books/book/deletebook/"+id, "", function(message) {
           $('#message').html(message);
@@ -12,18 +13,21 @@
      }).fail();
   }
 
+  //sends an ajax request to populate the book list
   var sortTable = function(orderby){
      $.get("/books/index/orderby/"+orderby+"?search="+$('#searchtext').val() , function(message) {
           $('#booklist').html(message);
      }).fail();
   }
 
+  //sends an ajax request to populate the book list with search text
   var executeSearch = function(){
      $.get("/books/index/orderby/title?search="+$('#searchtext').val(), function(message) {
           $('#booklist').html(message);
      }).fail();      
   }
 
+  //sends an ajax request that populates the book list on page load
   $(document).ready(function(){
      $('#booklist').html("loading");
      $.get("/books/index/orderby/title", function(message) {

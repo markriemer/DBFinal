@@ -4,6 +4,7 @@
 
 <script type="text/javascript">
 
+  //sends a ajax request that either inserts or deletes the auth/user pair from follows
   var toggle = function(){
      $.get("/books/follow/{{auth.id}}", "", function(message) {
         if(message=="unfollowed")
@@ -15,7 +16,9 @@
   }
 
 
+  //sends a ajax request that either adds the book/user to checkouts or adds return date 
   var checkout = function(book_id){
+    
      $.get("/books/checkout/" + book_id , function(message) {
         if(message=="checkedout")
           $('#checkout'+book_id).html("Return");
