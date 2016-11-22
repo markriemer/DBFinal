@@ -1,9 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-
 from django.db import models
-
 from .forms import ChangePasswordForm
 from .models import Books, Authors, Publishers, Wrote, Discusses, Users, Notifications, Follows, Checkouts
 from django.db import IntegrityError
@@ -13,7 +11,9 @@ from django.http import HttpResponse
 import datetime
 import sys
 
-# Create your views here.
+########################################################################
+# Security views
+########################################################################
 
 @login_required(login_url="login/")
 def main(request):
@@ -54,15 +54,13 @@ def discussion(request, book_id):
     book_context = {"messages" : book_dis.discussion_set.all()}
     return render(request, 'discussion.html', book_context)
 
+########################################################################
+# Administrator Views
+########################################################################
+
 #index is shell that makes ajax calls to booklist to populate list.  
 def index(request,orderby='book_id'):
     return render(request, 'books/index.html')
-
-#index is shell that makes ajax calls to booklist to populate list.  
-def viewindex(request,orderby='book_id'):
-    user=request.user
-    context = {"user" : user}
-    return render(request, 'books/viewindex.html', context)
 
 #the list of books shown by index. performs sorting and filtering 
 def booklist(request, orderby='book_id'):
@@ -217,6 +215,7 @@ def deleteauth(request, auth_id):
     except IntegrityError as e:
         return HttpResponse(auth.name + " could not be deleted due to a referential integrity error.", status=403)
 
+
 #shows pubshell which wraps publishers to prevent postbacks
 def pubshell(request):
     return render(request, 'books/pubshell.html')
@@ -269,29 +268,15 @@ def deletepub(request, pub_id):
     except IntegrityError as e:
         return HttpResponse(pub.name + " could not be deleted due to a referential integrity error.", status=403)
         
+########################################################################
+# User Views
+########################################################################
 
-def viewauthor(request,auth_id):
-    auth = Authors.objects.get(id=auth_id)
-    wrote_list = Wrote.objects.filter(author_id=auth)
-    followed = Follows.objects.filter(user_id=request.user.id,author_id=auth_id).count();
-
-    user_checkouts = list(Checkouts.objects.filter(user_id=request.user.id, returned_date__isnull=True))
-    books_out = [bk.book_id for bk in user_checkouts] 
-    checkouts=[entry for entry in wrote_list if entry.book.book_id in books_out]
-    wrote_list=[entry for entry in wrote_list if entry.book.book_id not in books_out]
-
-    context = {'auth':auth,'wrote_list':wrote_list, 'user':request.user, 'followed':followed, 'checkouts':checkouts}
-    return render(request, 'books/author.html', context)
-
-def viewbook(request, book_id):
-    book = Books.objects.get(book_id=book_id)
-    author_list = Authors.objects.all()
-    publisher_list = Publishers.objects.all()
-    wrote_list = Wrote.objects.filter(book=book_id)
-    discussion = Discusses.objects.filter(book_id=book_id);
-    context = {'book': book,'author_list':author_list,'publisher_list':publisher_list, 'wrote_list':wrote_list, 'discussion':discussion}
-    return render(request, 'books/viewbook.html', context)
-
+#viewindex is shell that makes ajax calls to viewbooklist to populate list.  
+def viewindex(request,orderby='book_id'):
+    user=request.user
+    context = {"user" : user}
+    return render(request, 'books/viewindex.html', context)
 
 #the list of books shown by index. performs sorting and filtering
 def viewbooklist(request, orderby='book_id'):
@@ -326,31 +311,49 @@ def viewbooklist(request, orderby='book_id'):
         reverse=True
         wrote_list = sorted(wrote_list,key= lambda x: x.book.pub.name, reverse=reverse)
 
+    #partition the list into checked out books and other books
     user_checkouts = list(Checkouts.objects.filter(user_id=request.user.id, returned_date__isnull=True))
-    books_out = [bk.book_id for bk in user_checkouts] 
+    books_out = [bk.book_id for bk in user_checkouts]
     checkouts=[entry for entry in wrote_list if entry.book.book_id in books_out]
     wrote_list=[entry for entry in wrote_list if entry.book.book_id not in books_out]
 
 
-    #this allows the template to not print duplicate data for books with multiple authors
+    #this allows the template to not print duplicate data for checked out books with multiple authors
     prev = 0
     for entry in checkouts:
          if entry.book == prev:
              entry.id = -1    #marks an entry to not repeat title and publisher
          prev=entry.book
 
-    #this allows the template to not print duplicate data for books with multiple authors
+    #this allows the template to not print duplicate data for other books with multiple authors
     prev = 0
     for entry in wrote_list:
          if entry.book == prev:
              entry.id = -1    #marks an entry to not repeat title and publisher
          prev=entry.book
 
-
     context = {'wrote_list':wrote_list,'titlesort':titlesort,'pubsort':pubsort,'checkouts':checkouts}
     resp = render(request, 'books/viewbooklist.html', context)
     return resp
 
+
+#render the view for a single book. 
+def viewbook(request, book_id):
+    book = Books.objects.get(book_id=book_id)
+    author_list = Authors.objects.all()
+    publisher_list = Publishers.objects.all()
+    wrote_list = Wrote.objects.filter(book=book_id)
+    discussion = Discusses.objects.filter(book_id=book_id);
+    context = {'book': book,'author_list':author_list,'publisher_list':publisher_list, 'wrote_list':wrote_list, 'discussion':discussion}
+    return render(request, 'books/viewbook.html', context)
+
+#responds to ajax request from viewbook to render the discussion forum
+def forum(request, book_id):
+    discussion = Discusses.objects.filter(book_id=book_id);
+    context = {'discussion':discussion,'user':request.user}
+    return render(request, 'books/forum.html', context)
+
+#handles ajax requests from viewbook to add post to discussion
 def postmessage(request):
     text = request.GET.get("text")
     book = Books.objects.get(book_id=request.GET.get("book"))
@@ -360,16 +363,29 @@ def postmessage(request):
     message.save()
     return HttpResponse(str(message.id))
 
-def forum(request, book_id):
-    discussion = Discusses.objects.filter(book_id=book_id);
-    context = {'discussion':discussion,'user':request.user}
-    return render(request, 'books/forum.html', context)
-
+#receives an ajax request from viewindex to render notification
 def notifications(request, user_id):
     notifications = Notifications.objects.filter(user_id=user_id);
     context = {'notifications':notifications}
     return render(request, 'books/notifications.html', context)
 
+#shows an individual author and the author's books
+def viewauthor(request,auth_id):
+    auth = Authors.objects.get(id=auth_id)
+    wrote_list = Wrote.objects.filter(author_id=auth)
+    followed = Follows.objects.filter(user_id=request.user.id,author_id=auth_id).count();
+
+    #partition the author's books into those checked out and those not
+    user_checkouts = list(Checkouts.objects.filter(user_id=request.user.id, returned_date__isnull=True))
+    books_out = [bk.book_id for bk in user_checkouts]
+    checkouts=[entry for entry in wrote_list if entry.book.book_id in books_out]
+    wrote_list=[entry for entry in wrote_list if entry.book.book_id not in books_out]
+
+    context = {'auth':auth,'wrote_list':wrote_list, 'user':request.user, 'followed':followed, 'checkouts':checkouts}
+    return render(request, 'books/author.html', context)
+
+
+#Toggles a user's follow of an author
 def follow(request, auth_id):
     follows = Follows.objects.filter(user_id=request.user.id,author_id=auth_id);
     if len(follows)==1:
@@ -381,6 +397,7 @@ def follow(request, auth_id):
         response="followed"
     return HttpResponse(response)
 
+#Handles checkouts and returns
 def checkout(request, book_id):
     returned_book = Checkouts.objects.filter(user_id=request.user.id, book_id=book_id, returned_date__isnull=True)
     if len(returned_book) > 0:
